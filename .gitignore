@@ -1,0 +1,9 @@
+# dir 不需要提交的目录
+/das/QNRF
+/das/shanghai
+/das/skt
+
+# 不需要提交的文件
+/das/csrnet_depth/dpt_large-midas-2f21e586.pt
+/das/csrnet_mask/new_mask.tar
+/das/mask_depth/mask_depth.tar

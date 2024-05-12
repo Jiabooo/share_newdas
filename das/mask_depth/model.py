@@ -4,7 +4,7 @@ from torchvision import models
 from utils import save_net, load_net
 import torch.nn.functional as F
 import cv2
-    
+import json
     
     
 class CSRNet(nn.Module):
@@ -25,7 +25,11 @@ class CSRNet(nn.Module):
 
         if not load_weights:
             self._initialize_weights()
-            pre = torch.load(r"G:\renqun\premodel\partBmodel_best.pth.tar")
+            with open("settings.json", 'r') as f:
+                settings_dict = json.load(f)
+            pre_dir = settings_dict["maskmodel_dir"]
+            # pre = torch.load(r"G:\renqun\premodel\partBmodel_best.pth.tar")
+            pre = torch.load(pre_dir)
             pre = pre['state_dict']
             
             for i in range(len(self.frontend.state_dict().items())):
@@ -35,20 +39,20 @@ class CSRNet(nn.Module):
                 list(self.backend.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]
 
                 
-            # for i in range(len(self.mask.state_dict().items())):
-            #     j = i+len(self.frontend.state_dict().items())+len(self.backend.state_dict().items())
-            #     list(self.mask.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]
-            # for i in range(len(self.conv4.state_dict().items())):
-            #     j = i+len(self.frontend.state_dict().items())+len(self.backend.state_dict().items())+len(self.mask.state_dict().items())
-            #     list(self.conv4.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]
-            #
-            # for i in range(len(self.output_layer.state_dict().items())):
-            #     j = i+len(self.frontend.state_dict().items())+len(self.backend.state_dict().items())+len(self.mask.state_dict().items())+len(self.conv4.state_dict().items())
-            #     list(self.output_layer.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]
-
+            for i in range(len(self.mask.state_dict().items())):
+                j = i+len(self.frontend.state_dict().items())+len(self.backend.state_dict().items())
+                list(self.mask.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]
             for i in range(len(self.conv4.state_dict().items())):
-                j = i + len(self.frontend.state_dict().items()) + len(self.backend.state_dict().items())
+                j = i+len(self.frontend.state_dict().items())+len(self.backend.state_dict().items())+len(self.mask.state_dict().items())
                 list(self.conv4.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]
+
+            for i in range(len(self.output_layer.state_dict().items())):
+                j = i+len(self.frontend.state_dict().items())+len(self.backend.state_dict().items())+len(self.mask.state_dict().items())+len(self.conv4.state_dict().items())
+                list(self.output_layer.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]
+
+            # for i in range(len(self.conv4.state_dict().items())):
+            #     j = i + len(self.frontend.state_dict().items()) + len(self.backend.state_dict().items())
+            #     list(self.conv4.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]
 
 
 

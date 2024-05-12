@@ -39,8 +39,15 @@ parser.add_argument('gpu',metavar='GPU', type=str,
 parser.add_argument('task',metavar='TASK', type=str,
                     help='task id to use.')
 
+def get_settings():
+    global settings_dict
+    with open("settings.json", 'r') as f:
+        settings_dict = json.load(f)
+
+
 def main():
-    
+    get_settings()
+
     global args,best_prec1, best_mse 
     
     best_prec1 = 1e6
@@ -72,7 +79,7 @@ def main():
     
     model1 = CSRNet1()
     model1 = model1.cuda()
-    pre = torch.load(r"G:\renqun\das\das\mask_depth\mask_depth.tar")
+    pre = torch.load(settings_dict["maskmodel_dir"])
     pre = pre['state_dict']
     model1.load_state_dict(pre)
     

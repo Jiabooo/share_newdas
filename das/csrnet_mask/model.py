@@ -26,9 +26,11 @@ class CSRNet(nn.Module):
 
         if not load_weights:
             self._initialize_weights()
-            settings_dict = json.loads("settings.json")
-            home = settings_dict['home_dir']
-            pre = torch.load(home+r"/csrnet_mask/new_mask.tar")
+            with open("settings.json", 'r') as f:
+                settings_dict = json.load(f)
+            premodel = settings_dict['premodel_dir']
+            # pre = torch.load(home+r"/csrnet_mask/new_mask.tar")
+            pre = torch.load(premodel)
             pre = pre['state_dict']
             
             for i in range(len(self.frontend.state_dict().items())):
@@ -38,16 +40,20 @@ class CSRNet(nn.Module):
                 list(self.backend.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]
 
                 
-            for i in range(len(self.mask.state_dict().items())):
-                j = i+len(self.frontend.state_dict().items())+len(self.backend.state_dict().items())
-                list(self.mask.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]
-            for i in range(len(self.conv4.state_dict().items())):
-                j = i+len(self.frontend.state_dict().items())+len(self.backend.state_dict().items())+len(self.mask.state_dict().items())
-                list(self.conv4.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]  
-                
+            # for i in range(len(self.mask.state_dict().items())):
+            #     j = i+len(self.frontend.state_dict().items())+len(self.backend.state_dict().items())
+            #     list(self.mask.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]
+            # for i in range(len(self.conv4.state_dict().items())):
+            #     j = i+len(self.frontend.state_dict().items())+len(self.backend.state_dict().items())+len(self.mask.state_dict().items())
+            #     list(self.conv4.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]
+            #
+            # for i in range(len(self.output_layer.state_dict().items())):
+            #     j = i+len(self.frontend.state_dict().items())+len(self.backend.state_dict().items())+len(self.mask.state_dict().items())+len(self.conv4.state_dict().items())
+            #     list(self.output_layer.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]
+
             for i in range(len(self.output_layer.state_dict().items())):
-                j = i+len(self.frontend.state_dict().items())+len(self.backend.state_dict().items())+len(self.mask.state_dict().items())+len(self.conv4.state_dict().items())
-                list(self.output_layer.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]    
+                j = i + len(self.frontend.state_dict().items()) + len(self.backend.state_dict().items())
+                list(self.output_layer.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]
 
                 
     def forward(self, x,mask):

@@ -40,7 +40,8 @@ parser.add_argument('task',metavar='TASK', type=str,
 
 def get_settings():
     global settings_dict
-    settings_dict = json.loads("settings.json")
+    with open("settings.json", 'r') as f:
+        settings_dict = json.load(f)
 
 
 
@@ -80,17 +81,17 @@ def main():
     model1 = CSRNet1()
     model1 = model1.cuda()
 
-    home_dir = settings_dict['home_dir']
+    # premodel = settings_dict['premodel_dir']
 
-    pre = torch.load(home_dir+ r"/csrnet_mask/new_mask.tar")
-    pre = pre['state_dict']
-    model1.load_state_dict(pre)
+    # pre = torch.load(premodel)
+    # pre = pre['state_dict']
+    # model1.load_state_dict(pre)
     
     model2 = CSRNet()
     model2 = model2.cuda()
-    pre = torch.load(home_dir+r"/csrnet_mask/new_mask.tar")
-    pre = pre['state_dict']
-    model2.load_state_dict(pre)
+    # pre = torch.load(premodel)
+    # pre = pre['state_dict']
+    # model2.load_state_dict(pre)
     
     criterion = nn.MSELoss(size_average=False).cuda()   #深度密度图
     # count_criterion = nn.MSELoss(size_average=False).cuda() #带有限制sigma大小的密度图

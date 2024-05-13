@@ -27,7 +27,8 @@ class CSRNet1(nn.Module):
         if not load_weights:
             self._initialize_weights()
             # pre = torch.load(r"/home/ch/csrnet_mask_A_1e7/0\6ceng_mask_63.0_102.5.tar")
-            settings_dict = json.loads("settings.json")
+            with open("settings.json", 'r') as f:
+                settings_dict = json.load(f)
             pre = torch.load(settings_dict['premodel_dir'])
             pre = pre['state_dict']
             

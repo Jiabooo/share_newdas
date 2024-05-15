@@ -16,3 +16,15 @@ das/csrnet_mask/__pycache__/model.cpython-38.pyc
 .idea/share_newdas.iml
 .idea/vcs.xml
 das/csrnet_mask/__pycache__/model.cpython-38.pyc
+das/csrnet_mask/__pycache__/model.cpython-38.pyc
+/das/csrnet_mask/__pycache__
+/das/csrnet_mask/__pycache__
+/das/csrnet_mask/__pycache__
+*.pyc
+/das/csrnet_mask/__pycache__
+*.pyc
+das/csrnet_mask_2/A_test.json
+das/csrnet_mask_2/A_train.json
+das/csrnet_mask_2/B_train.json
+das/csrnet_mask_2/new_mask.tar
+das/csrnet_mask_2/B_test.json

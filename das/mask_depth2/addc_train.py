@@ -21,6 +21,8 @@ import time
 import torch.nn.functional as F
 
 
+down = 10
+
 parser = argparse.ArgumentParser(description='PyTorch CSRNet')
 
 parser.add_argument('train_json', metavar='TRAIN',
@@ -37,17 +39,8 @@ parser.add_argument('gpu',metavar='GPU', type=str,
 parser.add_argument('task',metavar='TASK', type=str,
                     help='task id to use.')
 
-
-def get_settings():
-    global settings_dict
-    with open("settings.json", 'r') as f:
-        settings_dict = json.load(f)
-
-
-
 def main():
-    get_settings()
-
+    
     global args,best_prec1, best_mse 
     
     best_prec1 = 1e6
@@ -59,11 +52,10 @@ def main():
     args.momentum      = 0.95
     args.decay         = 5*1e-4
     args.start_epoch   = 0
-    args.epochs = 400
+    args.epochs = 600
     args.steps         = [-1,1,100,150]
     args.scales        = [1,1,1,1]
-    args.workers = 0
-    # args.workers = 4
+    args.workers = 4
     args.seed = time.time()
     args.print_freq = 400
     with open(args.train_json, 'r') as outfile:        
@@ -80,22 +72,12 @@ def main():
     
     model1 = CSRNet1()
     model1 = model1.cuda()
-
-    # premodel = settings_dict['premodel_dir']
-
-    # pre = torch.load(premodel)
-    # pre = pre['state_dict']
-    # model1.load_state_dict(pre)
+    pre = torch.load(r"G:\renqun\das\das\mask_depth\mask_depth.tar")
+    pre = pre['state_dict']
+    model1.load_state_dict(pre)
     
-    model2 = CSRNet()
-    model2 = model2.cuda()
-    # pre = torch.load(premodel)
-    # pre = pre['state_dict']
-    # model2.load_state_dict(pre)
-    
-    criterion = nn.MSELoss(size_average=False).cuda()   #深度密度图
-    # count_criterion = nn.MSELoss(size_average=False).cuda() #带有限制sigma大小的密度图
-    mask_criterion = nn.BCELoss(size_average=False).cuda()  #掩膜图
+    criterion = nn.MSELoss(size_average=False).cuda() #
+    mask_criterion = nn.BCELoss(size_average=False).cuda()
     
     optimizer = torch.optim.SGD(model.parameters(), args.lr,
                                 momentum = args.momentum,
@@ -108,7 +90,6 @@ def main():
             args.start_epoch = checkpoint['epoch']
             best_prec1 = checkpoint['best_prec1']
             model.load_state_dict(checkpoint['state_dict'])
-
             optimizer.load_state_dict(checkpoint['optimizer'])
             print("=> loaded checkpoint '{}' (epoch {})"
                   .format(args.pre, checkpoint['epoch']))
@@ -119,9 +100,8 @@ def main():
         
         adjust_learning_rate(optimizer, epoch)
         
-        # train(train_list, model, criterion,count_criterion, mask_criterion,optimizer, epoch,model1,model2)
-        train(train_list, model, criterion, mask_criterion,optimizer, epoch,model1,model2)
-        prec1,mse = validate(val_list, model, criterion, mask_criterion,model1,model2)
+        train(train_list, model, criterion,mask_criterion,optimizer, epoch,model1)
+        prec1,mse = validate(val_list, model, criterion,mask_criterion,model1)
         
         
         is_best = prec1 < best_prec1
@@ -140,11 +120,11 @@ def main():
 
     
     
-def train(train_list, model, criterion, mask_criterion,optimizer, epoch,model1,model2):
+def train(train_list, model, criterion,count_criterion, mask_criterion,optimizer, epoch,model1):
     
     losses = AverageMeter()
     losses_d = AverageMeter()
-    # losses_c = AverageMeter()
+    losses_c = AverageMeter()
     losses_mask = AverageMeter()
     batch_time = AverageMeter()
     data_time = AverageMeter()
@@ -156,7 +136,6 @@ def train(train_list, model, criterion, mask_criterion,optimizer, epoch,model1,m
                        transform=transforms.Compose([
                        transforms.ToTensor(),transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225]),
-
                    ]), 
                        train=True, 
                        seen=model.seen,
@@ -167,63 +146,52 @@ def train(train_list, model, criterion, mask_criterion,optimizer, epoch,model1,m
     
     model.train()
     model1.eval()
-    model2.eval()
     end = time.time()
     
-    for i,(img, target, mask_target)in enumerate(train_loader):
-        # print("1")
+    for i,(img, target,count_target, mask_target,depth)in enumerate(train_loader):
         data_time.update(time.time() - end)
         
         img = img.cuda()
         img = Variable(img)
         
-        output1,mask1 = model1(img)  # 得到图片img对应的mask   先得到掩膜
-        mask1 = torch.where(mask1>0.1,1,0)
-        output,mask2 = model2(img,mask1)  # 得到img*mask  再通过掩膜掩去背景，通过这个新的掩膜图去制作新的掩膜
-        output,mask = model(img,mask2)  # 最后用img和img*mask进行训练， output是密度图
+        output1,mask1 = model1(img) 
+        output1 = output1/down
+        mask1 = torch.where(mask1>0.01,1,1)
+        output1 = torch.where(output1>0.01,1,0)
+        depth = depth.type(torch.FloatTensor).unsqueeze(0).cuda()*output1
+        
 
-
-
-
-        mask_target = Variable(mask_target)  # mask的真实图
-        mask_target = mask_target.type(torch.FloatTensor).unsqueeze(0).cuda()
-        target = Variable(target)  #output对应的真实图
+        output,mask = model(img,depth,mask1)
+        mask_target = Variable(mask_target)
+        target = Variable(target)
         target = target.type(torch.FloatTensor).unsqueeze(0).cuda()
-        # count_target = Variable(count_target)  # output对应的真实图
-        # count_target = count_target.type(torch.FloatTensor).unsqueeze(0).cuda()
-
-        # print(mask_target)
-
-        # 使用torch.isnan()检测NaN值
-        # nan_mask = torch.isnan(mask_target)
-
-        # 检查是否有任何NaN值
-        # has_nan = torch.any(nan_mask)
-
-        # print(has_nan)
-        # print(f"mask's dtype: {mask.dtype}，mask1's dtype: {mask1.dtype}, mask2's dtype: {mask2.dtype}, mask_target's dtype: {mask_target.dtype}")
-
-        # loss_d = criterion(output, target) * 0.5
-        loss_d = criterion(output, target)
+        mask_target = mask_target.type(torch.FloatTensor).unsqueeze(0).cuda()
+        count_target = Variable(count_target)
+        count_target = count_target.type(torch.FloatTensor).unsqueeze(0).cuda()
 
         # test
         mask_target = torch.clamp(mask_target, min=0., max=1.)
 
-        mask_loss = mask_criterion(mask,mask_target) * 0.1
-        
-        loss = loss_d + mask_loss
+        loss_d = criterion(output, target) * 0.5
+        loss_c = count_criterion(output, count_target) * 0.5
+        mask_loss = mask_criterion(mask, mask_target) * 0.1
+
+        loss = loss_d + loss_c + mask_loss
 
         # loss_d = criterion(output, target)
-        # mask_loss = mask_criterion(mask, mask_target) * 0.1
+        # mask_loss = mask_criterion(mask,mask_target)*0.01
+        #
         # loss = loss_d + mask_loss
-
+        
         losses.update(loss.item(), img.size(0))
         losses_d.update(loss_d.item(), img.size(0))
+        losses_c.update(loss_c.item(), img.size(0))
         losses_mask.update(mask_loss.item(), img.size(0))
         
         optimizer.zero_grad()
         loss.backward()
-        optimizer.step()
+        optimizer.step()    
+        
         batch_time.update(time.time() - end)
         end = time.time()
         
@@ -238,7 +206,7 @@ def train(train_list, model, criterion, mask_criterion,optimizer, epoch,model1,m
                    epoch, i, len(train_loader), batch_time=batch_time,
                    data_time=data_time, loss=losses, loss_d=losses_d, mask_loss=losses_mask))
     
-def validate(val_list, model, criterion, mask_criterion,model1,model2):
+def validate(val_list, model, criterion, count_criterion, mask_criterion,model1):
     print ('begin test')
     test_loader = torch.utils.data.DataLoader(
     dataset.listDataset(val_list,
@@ -251,23 +219,25 @@ def validate(val_list, model, criterion, mask_criterion,model1,model2):
     
     model.eval()
     model1.eval()
-    model2.eval()
     mae = 0
     mse = 0
 
-    # for i, (img, target, count_target, mask_target) in enumerate(test_loader):
-    for i, (img, target, mask_target) in enumerate(test_loader):
+    for i, (img, target,count_target, mask_target,depth) in enumerate(test_loader):
         img = img.cuda()
         img = Variable(img)
 
+        
         with torch.no_grad():
             output1,mask1 = model1(img)
-            mask1 = torch.where(mask1>0.1,1,0)
-            output1,mask1 = model2(img,mask1)
-            output,mask = model(img,mask1)
+            output1 = output1/down
+            mask1 = torch.where(mask1>0.01,1,1)
+            output1 = torch.where(output1>0.01,1,0)
+            depth = depth.type(torch.FloatTensor).unsqueeze(0).cuda()*output1
+            
+            output,mask = model(img,mask1,depth)
 
-        # target_sum = (target.sum().type(torch.FloatTensor).cuda() + count_target.sum().type(torch.FloatTensor).cuda())/2
-        target_sum = target.sum().type(torch.FloatTensor).cuda()
+        target_sum = (target.sum().type(torch.FloatTensor).cuda() + count_target.sum().type(
+            torch.FloatTensor).cuda()) / 2
         mae += abs(output.data.sum() - target_sum)
         mse += (output.data.sum() - target_sum).pow(2)
         

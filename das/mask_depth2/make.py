@@ -18,19 +18,19 @@ from pylab import *
 from matplotlib import cm as CM
 import torch
 
-# 把<0.5的设为负数
+
 def Smooth_heaviside(x):
     x1 = 2 - 1 / (torch.sigmoid(6000 * x) )
     x2 = torch.sigmoid(6000 * x)
     return  x2*x1
 
 
-gt_path=r"D:\renqun\share_newdas\das\shanghai\part_A_final\test_data\ground_truth"
-img_path=r"D:\renqun\share_newdas\das\shanghai\part_A_final\test_data\images"
+gt_path=r"G:\renqun\das\das\shanghai\part_A_final\train_data\ground_truth"
+img_path=r"G:\renqun\das\das\shanghai\part_A_final\train_data\images"
 
 
 filelist = os.listdir(gt_path) 
-total_num = int(len(filelist)/2)    #groundtruth 文件夹中存有h5和mat文件
+total_num = int(len(filelist)/2)
 print(total_num)
 
 

@@ -296,12 +296,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-i', '--input_path', 
-        default=r"D:\renqun\new_das\new_das\das\shanghai\part_A_final\train_data\images",
+        default=r"D:\renqun\share_newdas\das\shanghai\part_A_final\test_data\images",
         help='folder with input images'
     )
 
     parser.add_argument('-o', '--output_path', 
-        default=r'D:\renqun\new_das\new_das\das\shanghai\part_A_final\train_data\depth',
+        default=r'D:\renqun\share_newdas\das\shanghai\part_A_final\test_data\depth',
         help='folder for output images'
     )
 

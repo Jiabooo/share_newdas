@@ -28,3 +28,12 @@ das/csrnet_mask_2/A_train.json
 das/csrnet_mask_2/B_train.json
 das/csrnet_mask_2/new_mask.tar
 das/csrnet_mask_2/B_test.json
+das/mask_depth2/A_test.json
+das/mask_depth2/A_test.json
+das/mask_depth2/A_train.json
+das/mask_depth2/B_test.json
+das/mask_depth2/B_train.json
+das/mask_depth2/mask_depth.tar
+das/mask_depth2/output119.jpg
+das/mask_depth2/output983.jpg
+das/mask_depth2/output9.jpg

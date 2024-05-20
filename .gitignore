@@ -37,3 +37,15 @@ das/mask_depth2/mask_depth.tar
 das/mask_depth2/output119.jpg
 das/mask_depth2/output983.jpg
 das/mask_depth2/output9.jpg
+das/csrnet_mask/__pycache__/model.cpython-38.pyc
+das/csrnet_mask/__pycache__/model.cpython-38.pyc
+das/mask_depth2.zip
+das/csrnet_mask/__pycache__/model.cpython-38.pyc
+das/mask_depth2/0model_best.pth.tar
+das/mask_depth2/A_test.json
+das/mask_depth2/A_train.json
+das/mask_depth2/B_test.json
+das/mask_depth2/B_train.json
+das/mask_depth2/dataset.py
+*.jpg
+das/mask_depth2/result_2.tar

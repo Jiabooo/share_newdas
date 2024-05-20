@@ -28,19 +28,19 @@ def main():
     
 
     
-    with open("B_test.json", 'r') as outfile:
+    with open("A_test.json", 'r') as outfile:
         test_list = json.load(outfile)
         
         
         
     model = CSRNet()
-    pretrained=torch.load(r"G:\renqun\das\das\mask_depth\mask_depth.tar")
+    pretrained=torch.load(r"D:\renqun\share_newdas\das\mask_depth2\0model_best.pth.tar")
     model = model.cuda()
     model.load_state_dict(pretrained['state_dict'])
     
     
     mask_model = CSRNet1()
-    pretrained=torch.load(r"G:\renqun\das\das\mask_depth\mask_depth.tar")
+    pretrained=torch.load(r"D:\renqun\share_newdas\das\mask_depth2\0model_best.pth.tar")
     mask_model = mask_model.cuda()
     mask_model.load_state_dict(pretrained['state_dict'])
     
@@ -76,7 +76,9 @@ def test(test_list, model,mask_model):
             output1,mask = mask_model(img)
             mask = torch.where(mask>0.1,1,1)
             output1 = torch.where(output1>0.1,0,0)
+
             depth = depth.type(torch.FloatTensor).unsqueeze(0).cuda()*output1
+            #output,mask = model(img,depth, mask)
             output,mask = model(img,mask,depth)
             mask1 = mask.clone().detach().cuda()
             
@@ -92,8 +94,8 @@ def test(test_list, model,mask_model):
             #mask = np.where(mask>=0.001,1,0)
             l = img1.copy()
             for i in range(img1.shape[2]):
-                l[:,:,i] = img1[:,:,i]*mask 
-            
+                l[:,:,i] = img1[:,:,i]*mask
+
             l = transform(l)
             output,mask = model(l.unsqueeze(0).cuda(),mask1,depth)
             mae1 += abs(output.data.sum() - target.sum().type(torch.FloatTensor).cuda())
@@ -102,8 +104,8 @@ def test(test_list, model,mask_model):
     N = len(test_loader)
     mae = mae / N
     mse = torch.sqrt(mse / N)
-    mae1 = mae1 / N
-    mse1 = torch.sqrt(mse1 / N)
+    # mae1 = mae1 / Npi
+    # mse1 = torch.sqrt(mse1 / N)
     print(all)
     print(' * MAE {mae:.3f} \t    * MSE {mse:.3f}'
           .format(mae=mae, mse=mse))

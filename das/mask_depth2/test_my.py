@@ -20,7 +20,7 @@ from torchvision import datasets, transforms
 import cv2
 from torch.autograd import Variable
 
-def locate_people(ori_x, ori_y, img, new_x, new_y, input_low_limit):
+def locate_people(ori_x, ori_y, img, new_x, new_y, input_low_limit, down):
     # 滑动窗口定位
     windows_num_x = 3
     windows_num_y = 5
@@ -59,16 +59,17 @@ def locate_people(ori_x, ori_y, img, new_x, new_y, input_low_limit):
             # print(new_small_img.shape)
 
             # counting
-            num = int(small_img.sum())
+            num = int(small_img.sum()/down)
 
             if num == 0:
                 continue
 
-            low_limit = 2
+            low_limit = 5
             high_limit = 20
 
             # dis = int((step_x*step_y/num)/2)
-            dis = int(new_step_x/8*new_step_y/8/num)
+            # dis = int(new_step_x/8*new_step_y/8/num)
+            dis = int(new_step_x/8*new_step_y/8/num/2)
             if dis < low_limit:
                 dis = low_limit
             if dis > high_limit:
@@ -90,13 +91,13 @@ def locate_people(ori_x, ori_y, img, new_x, new_y, input_low_limit):
                         # img_position[2, x, y] = 255
                         new_img[x+new_start_x, y+new_start_y] = 100000
 
-    total_num = int(img.sum())
+    total_num = int(img.sum()/down)
 
     print(total_num)
     low_limit = input_low_limit
     high_limit = 20
-    dis = int(((new_x/8 * new_y/8) / total_num) / 4)
-    # dis = int(((new_x/8 * new_y/8)/ total_num))
+    # dis = int(((new_x/8 * new_y/8) / total_num) / 4)
+    dis = int(((new_x/8 * new_y/8)/ total_num)/2)
     # dis = int(((step_x * step_y) / total_num**2) / 2)
     #dis = int(((new_x/8 + new_y/8) / total_num**2) / 8)
     if dis < low_limit:
@@ -138,7 +139,8 @@ transform=transforms.Compose([
 model = CSRNet()
 # pretrained = torch.load(r"D:\renqun\share_newdas\das\csrnet_mask\new_mask.tar")
 # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
-pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
+# pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
+pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\result_our_newmask.tar")
 # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\0model_best.pth.tar")
 model = model.cuda()
 model.load_state_dict(pretrained['state_dict'])
@@ -146,7 +148,8 @@ model.load_state_dict(pretrained['state_dict'])
 mask_model = CSRNet1()
 # pretrained = torch.load(r"D:\renqun\share_newdas\das\csrnet_mask\new_mask.tar")
 # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
-pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
+# pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
+pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\result_our_newmask.tar")
 # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\0model_best.pth.tar")
 mask_model = mask_model.cuda()
 mask_model.load_state_dict(pretrained['state_dict'])
@@ -161,7 +164,7 @@ pic_num = 30
 img_path = r"D:\renqun\share_newdas\das\shanghai\part_A_final/test_data/images/IMG_{}.jpg".format(pic_num)
 #img = "/home/ch/SH_A/test_data/images/IMG_1.jpg"
 
-temp = h5py.File(img_path.replace('.jpg','.h5').replace('images','ground_truth'), 'r')
+temp = h5py.File(img_path.replace('.jpg','.h5').replace('images','depth_density_map'), 'r')
 
 temp_1 = np.asarray(temp['density'])
 print("Original Count : ",int(np.sum(temp_1)) + 1)
@@ -199,10 +202,10 @@ mask1 = torch.where(mask1 > 0.01, 1, 0)
 output1 = torch.where(output1 > 0.01, 1, 0)
 depth = torch.Tensor(depth).type(torch.FloatTensor).unsqueeze(0).cuda() * output1
 
-# output, mask = model(img, mask1, depth)
-output, mask = model(img, depth,mask1)
+output, mask = model(img, mask1, depth)
+# output, mask = model(img, depth,mask1)
 # num = int((output.data.sum()/10).cpu().numpy())
-num = int((output.data.sum()).cpu().numpy())
+num = int((output.data.sum()).cpu().numpy()/10)
 
 
 output = np.asarray(output.detach().cpu().reshape(output.detach().cpu().shape[1],output.detach().cpu().shape[2]))
@@ -222,7 +225,7 @@ img_test2 = transform(img_test)
 
 img_position = np.asarray(img_test)
 print(img_position.shape)
-img_position = locate_people(output.shape[0],  output.shape[1], output, img_position.shape[0], img_position.shape[1], 2)
+img_position = locate_people(output.shape[0],  output.shape[1], output, img_position.shape[0], img_position.shape[1], 3, 10)
 
 # print(img_position)
 print("Predicted Count : ", num)
@@ -236,7 +239,7 @@ plt.savefig("my_output_position{}.jpg".format(pic_num),dpi=300,bbox_inches='tigh
 
 
 # gt
-img_position = locate_people(img_position.shape[0],  img_position.shape[0], temp_1, img_position.shape[0], img_position.shape[1], 1)
+img_position = locate_people(img_position.shape[0],  img_position.shape[0], temp_1, img_position.shape[0], img_position.shape[1], 1, 10)
 
 plt.axis('off')
 plt.imshow(img_position)
@@ -244,7 +247,7 @@ plt.imshow(img_position)
 # plt.show()
 plt.savefig("my_gt_output_position{}.jpg".format(pic_num),dpi=300,bbox_inches='tight', pad_inches=0)
 
-local_max = plm(temp_1, min_distance=2, num_peaks=num, exclude_border=False)
+local_max = plm(temp_1, min_distance=2, num_peaks=int(np.sum(temp_1)) + 1, exclude_border=False)
 # print(local_max)
 # img_position = img.cpu.numpy()
 img_position = np.array(img_test)

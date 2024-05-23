@@ -45,7 +45,9 @@ def get_settings():
         settings_dict = json.load(f)
 
 def main():
-    
+
+    get_settings()
+
     global args,best_prec1, best_mse 
     
     best_prec1 = 1e6
@@ -82,6 +84,7 @@ def main():
     model1.load_state_dict(pre)
     
     criterion = nn.MSELoss(size_average=False).cuda() #
+    count_criterion = nn.MSELoss(size_average=False).cuda()
     mask_criterion = nn.BCELoss(size_average=False).cuda()
     
     optimizer = torch.optim.SGD(model.parameters(), args.lr,
@@ -105,7 +108,7 @@ def main():
         
         adjust_learning_rate(optimizer, epoch)
         
-        train(train_list, model, criterion,mask_criterion,optimizer, epoch,model1)
+        train(train_list, model, criterion,count_criterion,mask_criterion,optimizer, epoch,model1)
         prec1,mse = validate(val_list, model, criterion,mask_criterion,model1)
         
         

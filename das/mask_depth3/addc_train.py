@@ -109,7 +109,7 @@ def main():
         adjust_learning_rate(optimizer, epoch)
         
         train(train_list, model, criterion,count_criterion,mask_criterion,optimizer, epoch,model1)
-        prec1,mse = validate(val_list, model, criterion,mask_criterion,model1)
+        prec1,mse = validate(val_list, model, criterion,count_criterion,mask_criterion,model1)
         
         
         is_best = prec1 < best_prec1

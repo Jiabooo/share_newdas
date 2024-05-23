@@ -248,8 +248,9 @@ def validate(val_list, model, criterion, count_criterion, mask_criterion,model1)
             # output,mask = model(img,mask1,depth)
             output,mask = model(img,depth,mask1) #normal forword
 
-        target_sum = (target.sum().type(torch.FloatTensor).cuda() + count_target.sum().type(
-            torch.FloatTensor).cuda()) / 2
+        # target_sum = (target.sum().type(torch.FloatTensor).cuda() + count_target.sum().type(
+            # torch.FloatTensor).cuda()) / 2
+        target_sum = target.sum().type(torch.FloatTensor).cuda()
         mae += abs(output.data.sum() - target_sum)
         mse += (output.data.sum() - target_sum).pow(2)
         

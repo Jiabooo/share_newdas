@@ -163,7 +163,7 @@ def train(train_list, model, criterion,count_criterion, mask_criterion,optimizer
         img = Variable(img)
         
         output1,mask1 = model1(img) 
-        output1 = output1/down
+        # output1 = output1/down
         mask1 = torch.where(mask1>0.01,1,0)
         output1 = torch.where(output1>0.01,1,0)
         depth = depth.type(torch.FloatTensor).unsqueeze(0).cuda()*output1
@@ -171,7 +171,7 @@ def train(train_list, model, criterion,count_criterion, mask_criterion,optimizer
 
         # output,mask = model(img,mask1,depth)
         output,mask = model(img,depth,mask1) # normal forward
-        output = output / down
+        # output = output / down
         mask_target = Variable(mask_target)
         target = Variable(target)
         target = target.type(torch.FloatTensor).unsqueeze(0).cuda()
@@ -241,14 +241,14 @@ def validate(val_list, model, criterion, count_criterion, mask_criterion,model1)
         
         with torch.no_grad():
             output1,mask1 = model1(img)
-            output1 = output1/down
+            # output1 = output1/down
             mask1 = torch.where(mask1>0.01,1,0)
             output1 = torch.where(output1>0.01,1,0)
             depth = depth.type(torch.FloatTensor).unsqueeze(0).cuda()*output1
             
             # output,mask = model(img,mask1,depth)
             output,mask = model(img,depth,mask1) #normal forword
-            output = output / down
+            # output = output / down
 
         # target_sum = (target.sum().type(torch.FloatTensor).cuda() + count_target.sum().type(
             # torch.FloatTensor).cuda()) / 2

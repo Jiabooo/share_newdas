@@ -49,3 +49,11 @@ das/mask_depth2/B_train.json
 das/mask_depth2/dataset.py
 *.jpg
 das/mask_depth2/result_2.tar
+das/mask_depth2/ressultModels/A_2model_best.pth.tar
+das/mask_depth2/ressultModels/Bmodel_best.pth.tar
+/das/natural_image/depth
+/das/natural_image/images
+das/mask_depth2/ressultModels/second_Amodel_best.pth.tar
+das/mask_depth2/ressultModels/second_Bmodel_best.pth.tar
+das/mask_depth3/mask_depth.tar
+das/mask_depth2/result_our_newmask.tar

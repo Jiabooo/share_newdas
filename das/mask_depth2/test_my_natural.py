@@ -1,3 +1,6 @@
+import math
+import shutil
+
 import h5py
 import scipy.io as io
 import PIL.Image as Image
@@ -22,17 +25,22 @@ from torch.autograd import Variable
 
 def locate_people(ori_x, ori_y, img, new_x, new_y, input_low_limit, down, small_point=False):
     # 滑动窗口定位
+    windows_num_x = 1
+    windows_num_y = 3
     # windows_num_x = 2
     # windows_num_y = 3
-    windows_num_x = 3
-    windows_num_y = 5
+    # windows_num_x = 3
+    # windows_num_y = 3
+    # windows_num_x = 4
+    # windows_num_y = 5
     # windows_num_x = 5
     # windows_num_y = 8
     # windows_num_x = 8
     # windows_num_y = 12
     step_x = int(ori_x/windows_num_x)
     step_y = int(ori_y/windows_num_y)
-    new_img = cv2.resize(np.float32(img), (new_y, new_x),interpolation=cv2.INTER_CUBIC)
+    # new_img = cv2.resize(np.float32(img), (new_y, new_x),interpolation=cv2.INTER_CUBIC)
+    new_img = cv2.resize(np.float32(img), (new_y, new_x),interpolation=cv2.INTER_AREA)
     print("new_img:")
     print(new_img.shape)
     new_step_x = int(new_x/windows_num_x)
@@ -66,14 +74,15 @@ def locate_people(ori_x, ori_y, img, new_x, new_y, input_low_limit, down, small_
             if num == 0:
                 continue
 
-            low_limit = 2
-            high_limit = 20
+            low_limit = 4
+            high_limit = 50
 
             # dis = 3
             # dis = int((step_x*step_y/num)/2)
             # dis = int(new_step_x/8*new_step_y/8/num)
             # dis = int(new_step_x/8*new_step_y/8/num/2)
-            dis = int(new_step_x/8*new_step_y/8/num/8)
+            # dis = int(new_step_x/8*new_step_y/8/num/8)
+            dis = int(math.sqrt(new_step_x / 8 * new_step_y / 8 / num) / 4)
             # dis = int(new_step_x/8*new_step_y/8 /(num**2))
             if dis < low_limit:
                 dis = low_limit
@@ -100,14 +109,14 @@ def locate_people(ori_x, ori_y, img, new_x, new_y, input_low_limit, down, small_
 
     print(total_num)
     low_limit = input_low_limit
-    high_limit = 20
+    high_limit = 50
     # dis = int(((new_x/8 * new_y/8) / total_num) / 4)
     # dis = int(((new_x/8 * new_y/8)/ total_num)/2)
     # dis = int(((step_x * step_y) / total_num**2) / 4)
     # dis = int(((step_x * step_y) / total_num**2) / 8)
     # dis = int(((new_x/8 + new_y/8) / total_num**2) / 8)
     # dis = int(((new_x/8 + new_y/8) / total_num**2) / 20)
-    dis = 2
+    dis = 8
     if dis < low_limit:
         dis = low_limit
     if dis > high_limit:
@@ -140,10 +149,10 @@ def locate_people(ori_x, ori_y, img, new_x, new_y, input_low_limit, down, small_
         # for x in range(loc[0] - 9, loc[0] + 8):
         #     for y in range(loc[1] - 9, loc[1] + 8):
         for x in range(loc[0]-3, loc[0] + 4):
-            if x > new_x-1:
+            if x > new_x-1 or x < 0:
                 continue
             for y in range(loc[1]-3, loc[1] + 4):
-                if y > new_y-1:
+                if y > new_y-1 or y < 0:
                     continue
                 img_position[x, y, 0] = 255
                 img_position[x, y, 1] = 255
@@ -162,11 +171,16 @@ transform=transforms.Compose([
 # model = model.cuda()
 # #loading the trained weights
 
+output_dir = "result_natural/"
+output_model = "A"
+
 
 model = CSRNet()
 # pretrained = torch.load(r"D:\renqun\share_newdas\das\csrnet_mask\new_mask.tar")
 # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
-pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
+# pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
+pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\A_2model_best.pth.tar")
+# pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\Bmodel_best.pth.tar")
 # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\result_our_newmask.tar")
 # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\0model_best.pth.tar")
 model = model.cuda()
@@ -175,7 +189,9 @@ model.load_state_dict(pretrained['state_dict'])
 mask_model = CSRNet1()
 # pretrained = torch.load(r"D:\renqun\share_newdas\das\csrnet_mask\new_mask.tar")
 # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
-pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
+# pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
+pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\second_Amodel_best.pth.tar")
+# pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\second_Bmodel_best.pth.tar")
 # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\result_our_newmask.tar")
 # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\0model_best.pth.tar")
 mask_model = mask_model.cuda()
@@ -187,7 +203,7 @@ mask_model.load_state_dict(pretrained['state_dict'])
 #model.load_state_dict(checkpoint['state_dict'])
 
 
-pic_num = 9
+pic_num = 1
 img_path = r"D:\renqun\share_newdas\das\natural_image/images/test{}.jpg".format(pic_num)
 #img = "/home/ch/SH_A/test_data/images/IMG_1.jpg"
 
@@ -320,7 +336,7 @@ img_position = np.asarray(img_test)
 print(img_position.shape)
 # img_position = locate_people(output.shape[0],  output.shape[1], output, img_position.shape[0], img_position.shape[1], 3, 10)
 # img_position = locate_people(output.shape[0],  output.shape[1], output, img_position.shape[0], img_position.shape[1], 3, 1)
-img_position = locate_people(output.shape[0],  output.shape[1], output, img_position.shape[0], img_position.shape[1], 3, 1)
+img_position = locate_people(output.shape[0],  output.shape[1], output, img_position.shape[0], img_position.shape[1], 1, 1)
 
 # print(img_position)
 print("Predicted Count : ", num)
@@ -329,9 +345,14 @@ plt.axis('off')
 plt.imshow(img_position)
 
 # plt.show()
-plt.savefig("my_output_position{}.jpg".format(pic_num),dpi=300,bbox_inches='tight', pad_inches=0)
+plt.savefig(output_dir+"{}_{}_my_output_position{}_{}.jpg".format(pic_num,output_model,pic_num, num),dpi=300,bbox_inches='tight', pad_inches=0)
 
 plt.axis('off');
 plt.imshow(output, cmap = c.jet)
 # plt.savefig("output{}.jpg".format(pic_num),dpi=300,bbox_inches='tight', pad_inches=0)
-plt.savefig("output{}.jpg".format(pic_num),dpi=1000,bbox_inches='tight', pad_inches=0)
+plt.savefig(output_dir+"{}_{}output{}_{}.jpg".format(pic_num,output_model,pic_num,num),dpi=1000,bbox_inches='tight', pad_inches=0)
+
+
+# 原图输出
+shutil.copy(img_path, output_dir+"{}_{}test{}.jpg".format(pic_num,output_model,pic_num))
+

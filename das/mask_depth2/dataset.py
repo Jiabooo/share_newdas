@@ -38,5 +38,6 @@ class listDataset(Dataset):
             img = self.transform(img)
         # return img_path,img,target, count_target, mask_target,depth_target
         # return img_path,img,target, mask_target,depth_target
-        return img,target, mask_target,depth_target
+        # return img,target, mask_target,depth_target
+        return img_path,img,target, mask_target,depth_target
 

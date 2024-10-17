@@ -33,14 +33,16 @@ transform=transforms.Compose([
 
 model = CSRNet()
 # pretrained = torch.load(r"D:\renqun\share_newdas\das\csrnet_mask\new_mask.tar")
-pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
+# pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
+pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\A_2model_best.pth.tar")
 # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\0model_best.pth.tar")
 model = model.cuda()
 model.load_state_dict(pretrained['state_dict'])
 
 mask_model = CSRNet1()
 # pretrained = torch.load(r"D:\renqun\share_newdas\das\csrnet_mask\new_mask.tar")
-pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
+# pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
+pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\second_Amodel_best.pth.tar")
 # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\0model_best.pth.tar")
 mask_model = mask_model.cuda()
 mask_model.load_state_dict(pretrained['state_dict'])
@@ -51,7 +53,7 @@ mask_model.load_state_dict(pretrained['state_dict'])
 #model.load_state_dict(checkpoint['state_dict'])
 
 
-pic_num = 30
+pic_num = 156
 img_path = r"D:\renqun\share_newdas\das\shanghai\part_A_final/test_data/images/IMG_{}.jpg".format(pic_num)
 #img = "/home/ch/SH_A/test_data/images/IMG_1.jpg"
 
@@ -69,32 +71,85 @@ print(img.unsqueeze(0))
 # output,mask = model(img.unsqueeze(0))
 # num = int(output.detach().cpu().sum().numpy())
 
-# get depth
-gt_path = img_path.replace('.jpg', '.h5').replace('images', 'ground_truth')
-gt_file = h5py.File(gt_path)
-depth_target = np.asarray(gt_file['density'])
-depth_target = np.clip(depth_target, 0, 50)
-depth_target = np.min(depth_target) + np.max(depth_target) - depth_target
-depth_target = depth_target  # -depth_target
-depth_target = cv2.resize(np.float32(depth_target),(int(depth_target.shape[1]/8),int(depth_target.shape[0]/8)),interpolation = cv2.INTER_AREA)
+#my
+allow_depth = False
+allow_density_as_depth = True
 
-depth = depth_target
+if allow_depth:
+    depth_path = img_path.replace('.jpg', '.png').replace('images', 'depth')
+    depth = cv2.imread(depth_path)
+    depth = cv2.resize(np.float32(depth),(int(depth.shape[1]/8),int(depth.shape[0]/8)),interpolation = cv2.INTER_AREA)
 
-model.eval()
-mask_model.eval()
-num = 0     #预计人数
+    # 转单通道
+    depth = cv2.cvtColor(depth, cv2.COLOR_RGB2GRAY)
+    # depth = np.clip(depth, 0, 1)
+    depth = depth/255
+    depth = np.clip(depth, 0, 1)
+    depth = np.min(depth) + np.max(depth) - depth
+    # print(depth)
 
-img = img.cuda()
-img = Variable(img)
+    print(depth.shape)
 
-output1, mask1 = mask_model(img)
-# output1 = output1/10
-mask1 = torch.where(mask1 > 0.01, 1, 0)
-output1 = torch.where(output1 > 0.01, 1, 0)
-depth = torch.Tensor(depth).type(torch.FloatTensor).unsqueeze(0).cuda() * output1
+    model.eval()
+    mask_model.eval()
+    num = 0     #预计人数
 
-# output, mask = model(img, mask1, depth)
-output, mask = model(img, depth,mask1)
+    img = img.cuda()
+    img = Variable(img)
+
+    output1, mask1 = mask_model(img)
+    # output, mask1 = mask_model(img)
+
+    mask1 = torch.where(mask1 > 0.01, 1, 0)
+    new_output1 = torch.where(output1 > 0.01, 1, 0)
+    print(output1.shape)
+
+    # print(output1)
+
+    pre_depth = torch.Tensor(depth).type(torch.FloatTensor).cuda() * output1
+    depth = torch.Tensor(pre_depth).type(torch.FloatTensor).cuda() * new_output1
+
+    # depth = torch.Tensor(depth).type(torch.FloatTensor).cuda() * new_output1
+    # print(depth)
+
+    output, mask = model(img, mask1, depth)
+    # output, mask = model(img, depth,mask1)
+    # num = int((output.data.sum()/10).cpu().numpy())
+
+elif allow_density_as_depth:
+    model.eval()
+    mask_model.eval()
+    num = 0     #预计人数
+
+    img = img.cuda()
+    img = Variable(img)
+
+    output1, mask1 = mask_model(img)
+    # output, mask1 = mask_model(img)
+
+    new_output = np.asarray(output1.detach().cpu().reshape(output1.detach().cpu().shape[1],output1.detach().cpu().shape[2]))
+    depth_target = np.clip(new_output, 0, 50)
+    depth_target = np.min(depth_target) + np.max(depth_target) - depth_target
+
+
+    mask1 = torch.where(mask1 > 0.01, 1, 0)
+    new_output1 = torch.where(output1 > 0.01, 1, 0)
+    print(output1.shape)
+
+    # pre_depth = torch.Tensor(depth).type(torch.FloatTensor).cuda() * output1
+    depth = torch.Tensor(depth_target).type(torch.FloatTensor).cuda() * new_output1
+
+    # print(depth)
+
+    # output, mask = model(img, mask1, depth)
+
+    output, mask = model(img, depth,mask1)
+    # num = int((output.data.sum()/10).cpu().numpy())
+
+else:
+    mask_model.eval()
+    output, mask1 = mask_model(img)
+
 # num = int((output.data.sum()/10).cpu().numpy())
 num = int((output.data.sum()).cpu().numpy())
 

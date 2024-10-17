@@ -66,8 +66,8 @@ def gaussian_filter_density(gt,depth):
         pt2d[pt[1],pt[0]] = 1.
         if gt_count > 1:
             sigma = (distances[i][1]+distances[i][2]+distances[i][3])*0.1
-            if sigma > 5:
-                sigma = 5
+            # if sigma > 5:
+            #     sigma = 5
         else:
             sigma = np.average(np.array(gt.shape))/2./2.  
         
@@ -262,7 +262,7 @@ def run(input_path, output_path, model_path, model_type="large", optimize=True):
         #prediction = (prediction-np.min(prediction))/(np.max(prediction)-np.min(prediction))
         
         mat = io.loadmat(img_name.replace('.jpg','.mat').replace('images','ground_truth').replace('IMG_','GT_IMG_'))
-        gt = mat["image_info"][0,0][0,0][0]        
+        gt = mat["image_info"][0,0][0,0][0]
         k = np.zeros((img.shape[0],img.shape[1]))    
         depth = (depth-np.min(depth))/(np.max(depth)-np.min(depth))  # 范围变化至0～1之间
         depth = np.max(depth)+np.min(depth)-depth  # 越深，人头越小
@@ -271,8 +271,8 @@ def run(input_path, output_path, model_path, model_type="large", optimize=True):
         for i in range(0,len(gt)):
             if int(gt[i][1])<img.shape[0] and int(gt[i][0])<img.shape[1]:
                 k[int(gt[i][1]),int(gt[i][0])]=1
-        
-        
+
+
         k = gaussian_filter_density(k,depth)
 
         with h5py.File(img_name.replace('.jpg','.h5').replace('images','depth_density_map'), 'w') as hf:
@@ -296,12 +296,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-i', '--input_path', 
-        default=r"D:\renqun\share_newdas\das\shanghai\part_A_final\test_data\images",
+        default=r"D:\renqun\share_newdas\das\shanghai\part_A_final\train_data\images",
         help='folder with input images'
     )
 
     parser.add_argument('-o', '--output_path', 
-        default=r'D:\renqun\share_newdas\das\shanghai\part_A_final\test_data\depth',
+        default=r'D:\renqun\share_newdas\das\shanghai\part_A_final\train_data\depth',
         help='folder for output images'
     )
 

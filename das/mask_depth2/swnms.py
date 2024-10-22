@@ -141,14 +141,14 @@ def get_candidate(ori_x, ori_y, img, new_img, new_x, new_y, input_low_limit, dow
             # print("new_small:i-"+ str(i) +"j-" + str(j))
             # print(new_small_img.shape)
 
-            print(np.max(new_img[new_start_x:new_end_x, new_start_y:new_end_y]))
+            # print(np.max(new_img[new_start_x:new_end_x, new_start_y:new_end_y]))
             if np.max(new_img[new_start_x:new_end_x, new_start_y:new_end_y]) < 0.05:
                 continue
 
             # counting
             num = int(small_img.sum()/down)
 
-            print("num" +str(num))
+            # print("num" +str(num))
 
             if num == 0:
                 continue
@@ -175,7 +175,7 @@ def get_candidate(ori_x, ori_y, img, new_img, new_x, new_y, input_low_limit, dow
             if dis > high_limit:
                 dis = high_limit
 
-            print(dis)
+            # print(dis)
 
             output_distance_array[new_start_x:new_end_x,new_start_y:new_end_y] = dis
 
@@ -185,7 +185,7 @@ def get_candidate(ori_x, ori_y, img, new_img, new_x, new_y, input_low_limit, dow
                 local_max = plm(new_small_img, min_distance=dis, num_peaks=num+2, exclude_border=False)
                 # local_max = plm(new_small_img, min_distance=4, num_peaks=num+2, exclude_border=False)
             for loc in local_max:
-                print(loc)
+                # print(loc)
                 # print("value" + str(new_small_img[loc[0], loc[1]]))
                 if new_small_img[loc[0], loc[1]] < 0.06:
                     continue
@@ -255,14 +255,14 @@ def have_step(ori_x, ori_y, img, new_img, new_x, new_y, input_low_limit, down):
             # print("new_small:i-"+ str(i) +"j-" + str(j))
             # print(new_small_img.shape)
 
-            print(np.max(new_small_img))
+            # print(np.max(new_small_img))
             if np.max(new_small_img) < 0.06:
                 continue
 
             # counting
             num = int(small_img.sum()/down)
 
-            print("num" +str(num))
+            # print("num" +str(num))
 
             if num == 0:
                 continue
@@ -290,7 +290,7 @@ def have_step(ori_x, ori_y, img, new_img, new_x, new_y, input_low_limit, down):
             if dis > high_limit:
                 dis = high_limit
 
-            print(dis)
+            # print(dis)
 
             # output_distance_array[new_start_x+new_x_shift:new_end_x+new_x_shift,new_start_y+new_y_shift:new_end_y+new_y_shift] = dis
 

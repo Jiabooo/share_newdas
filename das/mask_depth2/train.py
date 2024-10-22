@@ -232,7 +232,7 @@ def validate(val_list, model, criterion, mask_criterion,model1):
             output1 = torch.where(output1>0.01,1,0)
             depth = depth.type(torch.FloatTensor).unsqueeze(0).cuda()*output1
             
-            output,mask = model(img,mask1,depth)
+            output,mask = model(img,mask1,depth) # 注意这个是反的
         mae += abs(output.data.sum()/down - (target.sum()/down).type(torch.FloatTensor).cuda())
         mse += (output.data.sum()/down - (target.sum()/down).type(torch.FloatTensor).cuda()).pow(2)
         

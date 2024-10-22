@@ -57,3 +57,9 @@ das/mask_depth2/ressultModels/second_Amodel_best.pth.tar
 das/mask_depth2/ressultModels/second_Bmodel_best.pth.tar
 das/mask_depth3/mask_depth.tar
 das/mask_depth2/result_our_newmask.tar
+/das/mask_depth2/threshold_res_depth-down_npy
+/das/mask_depth2/threshold_res_depth_npy
+/das/mask_depth2/threshold_res_npy
+/das/mask_depth2/threshold_res_depth_B_npy
+*.rar
+/das/mask_depth2/threshold_res_npy

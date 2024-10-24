@@ -37,7 +37,8 @@ class listDataset(Dataset):
         if self.transform is not None:
             img = self.transform(img)
 
-        return img,target, count_target, mask_target,depth_target
+        # return img,target, count_target, mask_target,depth_target
+        return img_path, img,target, count_target, mask_target,depth_target
         # return img_path,img,target, mask_target,depth_target
         # return img,target, mask_target,depth_target
 

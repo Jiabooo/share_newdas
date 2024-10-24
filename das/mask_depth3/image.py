@@ -25,7 +25,7 @@ def load_data(img_path,train = True):
     target1 = torch.Tensor(target)
     mask_target = Smooth_heaviside(target1)   
     mask_target = mask_target.numpy()
-    count_target = count_target.numpy()
+    # count_target = count_target.numpy()
 
 
     gt_path = img_path.replace('.jpg','.h5').replace('images','depth_density_map')
@@ -68,7 +68,6 @@ def load_data(img_path,train = True):
     target = cv2.resize(target,(int(target.shape[1]/8),int(target.shape[0]/8)),interpolation = cv2.INTER_AREA)*64
     mask_target = cv2.resize(mask_target,(int(mask_target.shape[1]/8),int(mask_target.shape[0]/8)),interpolation = cv2.INTER_AREA)
     depth_target = cv2.resize(np.float32(depth_target),(int(depth_target.shape[1]/8),int(depth_target.shape[0]/8)),interpolation = cv2.INTER_AREA)
-    count_target = cv2.resize(count_target, (int(count_target.shape[1] / 8), int(count_target.shape[0] / 8)),
-    #                           interpolation=cv2.INTER_AREA) * 64
+    count_target = cv2.resize(count_target, (int(count_target.shape[1] / 8), int(count_target.shape[0] / 8)),interpolation=cv2.INTER_AREA) * 64
     return img,target, count_target, mask_target,depth_target
     #return img,target, mask_target,depth_target

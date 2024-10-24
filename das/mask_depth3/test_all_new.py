@@ -1,3 +1,4 @@
+#encoding=UTF8
 import h5py
 import scipy.io as io
 import PIL.Image as Image
@@ -31,19 +32,25 @@ def main():
         test_list = json.load(outfile)
 
     model = CSRNet()
-    pretrained = torch.load(r"G:\renqun\das\das\mask_depth\mask_depth.tar") # ×îºóÄÇ¸öbestÄ£ĞÍµÄÂ·¾¶
+    pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\A_2model_best.pth.tar") # æœ€åé‚£ä¸ªbestæ¨¡å‹çš„è·¯å¾„
     model = model.cuda()
     model.load_state_dict(pretrained['state_dict'])
 
     mask_model = CSRNet1()
-    pretrained = torch.load(r"G:\renqun\das\das\mask_depth\mask_depth.tar") # second_AÂ·¾¶£¬ÓÃÓÚÑÚÄ¤
+    pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\second_Amodel_best.pth.tar") # second_Aè·¯å¾„ï¼Œç”¨äºæ©è†œ
     mask_model = mask_model.cuda()
     mask_model.load_state_dict(pretrained['state_dict'])
 
-    test(test_list, model, mask_model)
+    output_density_dir = "predicted_density/A/"
+    if not os.path.exists(output_density_dir):  # å¦‚æœè·¯å¾„ä¸å­˜åœ¨
+        os.makedirs(output_density_dir)
+
+    test(test_list, model, mask_model, output_density_dir)
 
 
-def test(test_list, model, mask_model):
+
+
+def test(test_list, model, mask_model, output_density_dir):
     print('begin test')
     test_loader = torch.utils.data.DataLoader(
         dataset.listDataset(test_list,
@@ -59,7 +66,7 @@ def test(test_list, model, mask_model):
     mae = 0
     mse = 0
     all = 0
-    for i, (img,target, count_target, mask_target,depth) in enumerate(test_loader):
+    for i, (img_path, img,target, count_target, mask_target,depth) in enumerate(test_loader):
         img = img.cuda()
         img = Variable(img)
 
@@ -79,6 +86,18 @@ def test(test_list, model, mask_model):
         target_sum = target.sum().type(torch.FloatTensor).cuda()
         mae += abs(output.data.sum() - target_sum)
         mse += (output.data.sum() - target_sum).pow(2)
+
+        # ä¿å­˜å›¾åƒ
+        # print(output.shape)
+        # print(img_path)
+        fileName = os.path.basename(img_path[0])
+        pic_num = fileName[4:-4]
+        print(pic_num)
+        output = output.cpu().numpy()
+        output = np.asarray(output.reshape(output.shape[2], output.shape[3]))
+        # print(output)
+        print("progress:" + str(i+1))
+        np.save(output_density_dir + "Density_{}.npy".format(pic_num), output)
 
     N = len(test_loader)
     mae = mae / N

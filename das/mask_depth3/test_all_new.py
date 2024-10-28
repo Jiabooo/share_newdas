@@ -28,20 +28,24 @@ transform = transforms.Compose([
 
 
 def main():
-    with open("A_test.json", 'r') as outfile:
+    # with open("A_test.json", 'r') as outfile:
+    #     test_list = json.load(outfile)
+    with open("B_test.json", 'r') as outfile:
         test_list = json.load(outfile)
 
     model = CSRNet()
-    pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\A_2model_best.pth.tar") # 最后那个best模型的路径
+    # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\A_2model_best.pth.tar") # 最后那个best模型的路径
+    pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\Bmodel_best.pth.tar")
     model = model.cuda()
     model.load_state_dict(pretrained['state_dict'])
 
     mask_model = CSRNet1()
-    pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\second_Amodel_best.pth.tar") # second_A路径，用于掩膜
+    # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\second_Amodel_best.pth.tar") # second_A路径，用于掩膜
+    pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\second_Bmodel_best.pth.tar")
     mask_model = mask_model.cuda()
     mask_model.load_state_dict(pretrained['state_dict'])
 
-    output_density_dir = "predicted_density/A/"
+    output_density_dir = "predicted_density/B/"
     if not os.path.exists(output_density_dir):  # 如果路径不存在
         os.makedirs(output_density_dir)
 

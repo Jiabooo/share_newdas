@@ -73,17 +73,20 @@ def get_candidate(ori_x, ori_y, img, new_img, new_x, new_y, input_low_limit, dow
                 continue
 
             # low_limit = 1
+            # low_limit = 1
             # low_limit = 10
             # low_limit = 7
             low_limit = 6
             # low_limit = 1
-            high_limit = 15
+            # high_limit = 15
+            high_limit = 20
 
             # dis = int((step_x*step_y/num)/2)
             # dis = int(math.sqrt(new_step_x/8*new_step_y/8/num)/4)
             # dis = int(math.sqrt(new_step_x/8*new_step_y/8/num)/1)
             # dis = int(math.sqrt(new_step_x/8*new_step_y/8/num)*2)
-            dis = int(math.sqrt(new_step_x/8*new_step_y/8/num)*2.5)
+            # dis = int(math.sqrt(new_step_x/8*new_step_y/8/num)*2.5)
+            dis = int(math.sqrt(new_step_x/8*new_step_y/8/num)*3)
             # dis = int(math.sqrt(new_step_x/8*new_step_y/8/num)/2)
             # dis = int(math.sqrt(new_step_x/8*new_step_y/8/(num/2)))
             # dis = int(math.sqrt(new_step_x/8*new_step_y/8/num)/8)
@@ -103,7 +106,7 @@ def get_candidate(ori_x, ori_y, img, new_img, new_x, new_y, input_low_limit, dow
             # prefetch points
             local_max = plm(new_small_img, min_distance=dis, num_peaks=num, exclude_border=False)
             if num < 5:
-                local_max = plm(new_small_img, min_distance=dis, num_peaks=num+2, exclude_border=False)
+                local_max = plm(new_small_img, min_distance=dis, num_peaks=num+1, exclude_border=False)
                 # local_max = plm(new_small_img, min_distance=4, num_peaks=num+2, exclude_border=False)
             for loc in local_max:
                 # print(loc)
@@ -193,14 +196,15 @@ def have_step(ori_x, ori_y, img, new_img, new_x, new_y, input_low_limit, down):
             # low_limit = 8
             low_limit = 6
             # low_limit = 1
-            high_limit = 15
+            high_limit = 20
 
             # dis = int((step_x*step_y/num)/2)
             # dis = int(math.sqrt(new_step_x/8*new_step_y/8/num)/4)
             # dis = int(math.sqrt(new_step_x/8*new_step_y/8/num)/1)
             # dis = int(math.sqrt(new_step_x/8*new_step_y/8/num)*2)
             # dis = int(math.sqrt(new_step_x/8*new_step_y/8/(num*num))*5)
-            dis = int(math.sqrt(new_step_x / 8 * new_step_y / 8 / num) * 2.5)
+            # dis = int(math.sqrt(new_step_x / 8 * new_step_y / 8 / num) * 2.5)
+            dis = int(math.sqrt(new_step_x / 8 * new_step_y / 8 / num) * 3)
             # dis = int(math.sqrt(new_step_x/8*new_step_y/8/num)/2)
             # dis = int(math.sqrt(new_step_x/8*new_step_y/8/(num/2)))
             # dis = int(math.sqrt(new_step_x/8*new_step_y/8/num)/8)
@@ -220,7 +224,7 @@ def have_step(ori_x, ori_y, img, new_img, new_x, new_y, input_low_limit, down):
             # prefetch points
             local_max = plm(new_small_img, min_distance=dis, num_peaks=num, exclude_border=False)
             if num < 5:
-                local_max = plm(new_small_img, min_distance=dis, num_peaks=num+2, exclude_border=False)
+                local_max = plm(new_small_img, min_distance=dis, num_peaks=num+1, exclude_border=False)
             for loc in local_max:
                 # print("value" + str(new_small_img[loc[0], loc[1]]))
                 if new_small_img[loc[0], loc[1]] < 0.06:

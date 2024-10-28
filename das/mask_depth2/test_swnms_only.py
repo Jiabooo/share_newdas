@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 from swnms_utils_peak import peak_local_max
 from skimage import data, img_as_float
 import numpy as np
-from swnms import *
+# from swnms import *
+from swnms_B import *
 import math
 import shutil
 
@@ -34,40 +35,45 @@ transform=transforms.Compose([
                                      std=[0.229, 0.224, 0.225]),
                    ])
 
-# output_dir = "threshold_res_depth_B/"
-input_dir = "predicted_density/A/"
-output_dir = "threshold_res_swnmsOnly/"
+
+# input_dir = "predicted_density/B/"
+# input_dir = "pk/csrnet/A/result/"
+input_dir = "pk/csrnet/B/result/"
+# output_dir = "threshold_res_swnmsOnly_B/"
+# output_dir = "pk/csrnet/A/result_map/"
+output_dir = "pk/csrnet/B/result_map/"
 if not os.path.exists(output_dir):  # 如果路径不存在
     os.makedirs(output_dir)
 # output_npy_dir = "threshold_res_depth_B_npy/"
-output_npy_dir = "threshold_res_swnmsOnly_npy/"
+# output_npy_dir = "threshold_res_swnmsOnly_npy_B/"
+output_npy_dir = "pk/csrnet/B/result_npy/"
 if not os.path.exists(output_npy_dir):  # 如果路径不存在
     os.makedirs(output_npy_dir)
-output_model = "A"
+output_model = "B"
 allow_print = False
 
 
-model = CSRNet()
-# pretrained = torch.load(r"D:\renqun\share_newdas\das\csrnet_mask\new_mask.tar")
-# pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
-# pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
-pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\A_2model_best.pth.tar")
+# model = CSRNet()
+# # pretrained = torch.load(r"D:\renqun\share_newdas\das\csrnet_mask\new_mask.tar")
+# # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
+# # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
+# # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\A_2model_best.pth.tar")
 # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\Bmodel_best.pth.tar")
-# pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\result_our_newmask.tar")
-# pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\0model_best.pth.tar")
-model = model.cuda()
-model.load_state_dict(pretrained['state_dict'])
-
-mask_model = CSRNet1()
-# pretrained = torch.load(r"D:\renqun\share_newdas\das\csrnet_mask\new_mask.tar")
-# pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
-# pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
-pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\second_Amodel_best.pth.tar")
+# # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\result_our_newmask.tar")
+# # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\0model_best.pth.tar")
+# model = model.cuda()
+# model.load_state_dict(pretrained['state_dict'])
+#
+# mask_model = CSRNet1()
+# # pretrained = torch.load(r"D:\renqun\share_newdas\das\csrnet_mask\new_mask.tar")
+# # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
+# # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\mask_depth.tar")
+# # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\second_Amodel_best.pth.tar")
 # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\second_Bmodel_best.pth.tar")
-# pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\result_our_newmask.tar")
-# pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\0model_best.pth.tar")
-mask_model = mask_model.cuda()
-mask_model.load_state_dict(pretrained['state_dict'])
+# # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\result_our_newmask.tar")
+# # pretrained = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\0model_best.pth.tar")
+# mask_model = mask_model.cuda()
+# mask_model.load_state_dict(pretrained['state_dict'])
 
 
 
@@ -78,7 +84,8 @@ mask_model.load_state_dict(pretrained['state_dict'])
 
 
 def run_test_location(pic_num):
-    img_path = r"D:\renqun\share_newdas\das\shanghai\part_A_final/test_data/images/IMG_{}.jpg".format(pic_num)
+    # img_path = r"D:\renqun\share_newdas\das\shanghai\part_A_final/test_data/images/IMG_{}.jpg".format(pic_num)
+    img_path = r"D:\renqun\share_newdas\das\shanghai\part_B_final/test_data/images/IMG_{}.jpg".format(pic_num)
 
     output = np.load(input_dir + "Density_{}.npy".format(pic_num))
     num = int(np.sum(output))
@@ -190,19 +197,20 @@ def run_test_location(pic_num):
 #     print(pic_num)
 #     run_test_location(pic_num)
 
-for pic_num in range(78, 182+1):
+for pic_num in range(1, 182+1):
     if(pic_num % 10 == 0):
         # torch.cuda.empty_cache()
         gc.collect(generation=2)
     print(pic_num)
     run_test_location(pic_num)
 
-# for pic_num in range(88, 316+1):
-#     # if(pic_num % 10 == 0):
-#     #     torch.cuda.empty_cache()
-#     #     gc.collect()
+# for pic_num in range(219, 316+1):
+#     if(pic_num % 10 == 0):
+#         # torch.cuda.empty_cache()
+#         gc.collect(generation=2)
 #     print(pic_num)
 #     run_test_location(pic_num)
+
 
 # run_test_location(30)
 # run_test_location(54)

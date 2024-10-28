@@ -66,3 +66,10 @@ das/mask_depth2/result_our_newmask.tar
 /das/mask_depth2/predicted_density/A
 /das/mask_depth2/threshold_res_swnmsOnly_npy
 /das/mask_depth3/predicted_density/A
+/das/mask_depth2/predicted_density/B
+*.npy
+*.npy
+/das/mask_depth2/pk
+/das/mask_depth2/pk/csrnet/B/result
+das/mask_depth2/pk/csrnet/B/result/Density_10.npy
+*.npy

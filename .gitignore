@@ -73,3 +73,4 @@ das/mask_depth2/result_our_newmask.tar
 /das/mask_depth2/pk/csrnet/B/result
 das/mask_depth2/pk/csrnet/B/result/Density_10.npy
 *.npy
+/das/csrnet_mask_woSigma

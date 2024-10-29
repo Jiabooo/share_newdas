@@ -161,7 +161,7 @@ def train(train_list, model, criterion,mask_criterion,optimizer, epoch,model1):
         img = Variable(img)
         
         output1,mask1 = model1(img) 
-        output1 = output1/down
+        # output1 = output1/down
         mask1 = torch.where(mask1>0.01,1,0)
         output1 = torch.where(output1>0.01,1,0)
         depth = depth.type(torch.FloatTensor).unsqueeze(0).cuda()*output1
@@ -173,9 +173,11 @@ def train(train_list, model, criterion,mask_criterion,optimizer, epoch,model1):
         target = target.type(torch.FloatTensor).unsqueeze(0).cuda()
         mask_target = mask_target.type(torch.FloatTensor).unsqueeze(0).cuda()
 
+        # test
+        mask_target = torch.clamp(mask_target, min=0., max=1.)
 
         loss_d = criterion(output, target)
-        mask_loss = mask_criterion(mask,mask_target)*0.01
+        mask_loss = mask_criterion(mask,mask_target)*0.1
         
         loss = loss_d + mask_loss
         

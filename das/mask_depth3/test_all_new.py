@@ -30,7 +30,7 @@ transform = transforms.Compose([
 def main():
     # with open("A_test.json", 'r') as outfile:
     #     test_list = json.load(outfile)
-    with open("B_test.json", 'r') as outfile:
+    with open("../mask_depth_woSigma/B_test.json", 'r') as outfile:
         test_list = json.load(outfile)
 
     model = CSRNet()

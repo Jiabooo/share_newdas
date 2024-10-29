@@ -197,19 +197,19 @@ def run_test_location(pic_num):
 #     print(pic_num)
 #     run_test_location(pic_num)
 
-for pic_num in range(1, 182+1):
-    if(pic_num % 10 == 0):
-        # torch.cuda.empty_cache()
-        gc.collect(generation=2)
-    print(pic_num)
-    run_test_location(pic_num)
-
-# for pic_num in range(219, 316+1):
+# for pic_num in range(1, 182+1):
 #     if(pic_num % 10 == 0):
 #         # torch.cuda.empty_cache()
 #         gc.collect(generation=2)
 #     print(pic_num)
 #     run_test_location(pic_num)
+
+for pic_num in range(255, 316+1):
+    if(pic_num % 10 == 0):
+        # torch.cuda.empty_cache()
+        gc.collect(generation=2)
+    print(pic_num)
+    run_test_location(pic_num)
 
 
 # run_test_location(30)

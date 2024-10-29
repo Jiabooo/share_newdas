@@ -28,7 +28,7 @@ def main():
     
 
     
-    with open("B_test.json", 'r') as outfile:
+    with open("../mask_depth_woSigma/B_test.json", 'r') as outfile:
         test_list = json.load(outfile)
         
         

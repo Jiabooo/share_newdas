@@ -29,6 +29,7 @@ class CSRNet(nn.Module):
                 settings_dict = json.load(f)
             pre_dir = settings_dict["maskmodel_dir"]
             # pre = torch.load(r"G:\renqun\premodel\partBmodel_best.pth.tar")
+            # pre = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\A_2model_best.pth.tar")
             pre = torch.load(pre_dir)
             pre = pre['state_dict']
             
@@ -46,9 +47,9 @@ class CSRNet(nn.Module):
                 j = i+len(self.frontend.state_dict().items())+len(self.backend.state_dict().items())+len(self.mask.state_dict().items())
                 list(self.conv4.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]
 
-            for i in range(len(self.output_layer.state_dict().items())):
-                j = i+len(self.frontend.state_dict().items())+len(self.backend.state_dict().items())+len(self.mask.state_dict().items())+len(self.conv4.state_dict().items())
-                list(self.output_layer.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]
+            # for i in range(len(self.output_layer.state_dict().items())):
+            #     j = i+len(self.frontend.state_dict().items())+len(self.backend.state_dict().items())+len(self.mask.state_dict().items())+len(self.conv4.state_dict().items())
+            #     list(self.output_layer.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]
 
             # for i in range(len(self.conv4.state_dict().items())):
             #     j = i + len(self.frontend.state_dict().items()) + len(self.backend.state_dict().items())

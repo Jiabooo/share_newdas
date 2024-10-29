@@ -56,6 +56,7 @@ def main():
     args.original_lr = 1e-7
     args.lr = 1e-7
     args.batch_size    = 1
+    # args.batch_size    = 4
     args.momentum      = 0.95
     args.decay         = 5*1e-4
     args.start_epoch   = 0
@@ -76,6 +77,10 @@ def main():
     model = CSRNet()
     
     model = model.cuda()
+    # pre = torch.load(settings_dict["maskmodel_dir"])
+    # pre = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\A_2model_best.pth.tar")
+    # pre = pre['state_dict']
+    # model.load_state_dict(pre)
     
     model1 = CSRNet1()
     model1 = model1.cuda()
@@ -174,7 +179,12 @@ def train(train_list, model, criterion,mask_criterion,optimizer, epoch,model1):
         mask_target = mask_target.type(torch.FloatTensor).unsqueeze(0).cuda()
 
         # test
-        mask_target = torch.clamp(mask_target, min=0., max=1.)
+        mask_target = torch.clamp(mask_target, min=0.0, max=1.0)
+
+        # print("mask1 min/max:", mask1.min().item(), mask1.max().item())
+        # print("output1 min/max:", output1.min().item(), output1.max().item())
+        # print("mask min/max:", mask.min().item(), mask.max().item())
+        # print("mask_target min/max:", mask_target.min().item(), mask_target.max().item())
 
         loss_d = criterion(output, target)
         mask_loss = mask_criterion(mask,mask_target)*0.1

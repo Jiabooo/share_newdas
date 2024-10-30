@@ -47,9 +47,9 @@ class CSRNet(nn.Module):
                 j = i+len(self.frontend.state_dict().items())+len(self.backend.state_dict().items())+len(self.mask.state_dict().items())
                 list(self.conv4.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]
 
-            # for i in range(len(self.output_layer.state_dict().items())):
-            #     j = i+len(self.frontend.state_dict().items())+len(self.backend.state_dict().items())+len(self.mask.state_dict().items())+len(self.conv4.state_dict().items())
-            #     list(self.output_layer.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]
+            for i in range(len(self.output_layer.state_dict().items())):
+                j = i+len(self.frontend.state_dict().items())+len(self.backend.state_dict().items())+len(self.mask.state_dict().items())+len(self.conv4.state_dict().items())
+                list(self.output_layer.state_dict().items())[i][1].data[:] = list(pre.items())[j][1].data[:]
 
             # for i in range(len(self.conv4.state_dict().items())):
             #     j = i + len(self.frontend.state_dict().items()) + len(self.backend.state_dict().items())

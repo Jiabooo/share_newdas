@@ -180,6 +180,7 @@ def train(train_list, model, criterion,mask_criterion,optimizer, epoch,model1):
 
         # test
         mask_target = torch.clamp(mask_target, min=0.0, max=1.0)
+        mask = torch.clamp(mask, min=0.0, max=1.0)
 
         # print("mask1 min/max:", mask1.min().item(), mask1.max().item())
         # print("output1 min/max:", output1.min().item(), output1.max().item())

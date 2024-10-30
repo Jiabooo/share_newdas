@@ -78,7 +78,7 @@ def main():
     
     model = model.cuda()
     # pre = torch.load(settings_dict["maskmodel_dir"])
-    # pre = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\A_2model_best.pth.tar")
+    # # pre = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\A_2model_best.pth.tar")
     # pre = pre['state_dict']
     # model.load_state_dict(pre)
     
@@ -179,14 +179,17 @@ def train(train_list, model, criterion,mask_criterion,optimizer, epoch,model1):
         mask_target = mask_target.type(torch.FloatTensor).unsqueeze(0).cuda()
 
         # test
-        mask_target = torch.where(mask_target > 0.01, 1, 0)
-        mask = torch.where(mask > 0.01, 1, 0)
-        mask = mask.type(torch.FloatTensor).cuda()
-        mask_target = mask_target.type(torch.FloatTensor).cuda()
+        # mask_target = torch.where(mask_target > 0.01, 1, 0)
+        # mask = torch.where(mask > 0.01, 1, 0)
+        # mask = mask.type(torch.FloatTensor).cuda()
+        # mask_target = mask_target.type(torch.FloatTensor).cuda()
+
         # print("mask1 min/max:", mask1.min().item(), mask1.max().item())
         # print("output1 min/max:", output1.min().item(), output1.max().item())
         # print("mask min/max:", mask.min().item(), mask.max().item())
         # print("mask_target min/max:", mask_target.min().item(), mask_target.max().item())
+
+        # mask_target = torch.clamp(mask_target, min=0., max=1.)
 
         loss_d = criterion(output, target)
         mask_loss = mask_criterion(mask,mask_target)*0.1
@@ -246,8 +249,9 @@ def validate(val_list, model, criterion, mask_criterion,model1):
             output,mask = model(img,depth,mask1)
         # mae += abs(output.data.sum()/down - (target.sum()/down).type(torch.FloatTensor).cuda())
         # mse += (output.data.sum()/down - (target.sum()/down).type(torch.FloatTensor).cuda()).pow(2)
-        mae += abs(output.data.sum() - (target.sum()).type(torch.FloatTensor).cuda())
-        mse += (output.data.sum() - (target.sum()).type(torch.FloatTensor).cuda()).pow(2)
+        target_sum = target.sum().type(torch.FloatTensor).cuda()
+        mae += abs(output.data.sum() - target_sum)
+        mse += (output.data.sum() - target_sum).pow(2)
         
         
     N = len(test_loader)

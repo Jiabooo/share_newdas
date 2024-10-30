@@ -64,7 +64,8 @@ def load_data(img_path,train = True):
     
     
     
-    target = cv2.resize(target,(int(target.shape[1]/8),int(target.shape[0]/8)),interpolation = cv2.INTER_AREA)*64*10
+    # target = cv2.resize(target,(int(target.shape[1]/8),int(target.shape[0]/8)),interpolation = cv2.INTER_AREA)*64*10
+    target = cv2.resize(target,(int(target.shape[1]/8),int(target.shape[0]/8)),interpolation = cv2.INTER_AREA)*64
     mask_target = cv2.resize(mask_target,(int(mask_target.shape[1]/8),int(mask_target.shape[0]/8)),interpolation = cv2.INTER_AREA)
     depth_target = cv2.resize(np.float32(depth_target),(int(depth_target.shape[1]/8),int(depth_target.shape[0]/8)),interpolation = cv2.INTER_AREA)
     # count_target = cv2.resize(count_target, (int(count_target.shape[1] / 8), int(count_target.shape[0] / 8)),

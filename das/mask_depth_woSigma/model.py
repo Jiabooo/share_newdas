@@ -28,7 +28,7 @@ class CSRNet(nn.Module):
             with open("settings.json", 'r') as f:
                 settings_dict = json.load(f)
             pre_dir = settings_dict["maskmodel_dir"]
-            # pre = torch.load(r"G:\renqun\premodel\partBmodel_best.pth.tar")
+            # pre = torch.load(r"mask_depth.tar")
             # pre = torch.load(r"D:\renqun\share_newdas\das\mask_depth2\ressultModels\A_2model_best.pth.tar")
             pre = torch.load(pre_dir)
             pre = pre['state_dict']
@@ -59,6 +59,7 @@ class CSRNet(nn.Module):
 
     def forward(self, x, depth, mask):
         x = self.frontend(x)
+        # x = (x+depth)*mask
         x = (x+depth)*mask
         # x = x*mask
         x1 = x

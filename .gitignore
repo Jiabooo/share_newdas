@@ -75,3 +75,6 @@ das/mask_depth2/pk/csrnet/B/result/Density_10.npy
 *.npy
 /das/csrnet_mask_woSigma
 *.tar
+das/mask_depth2/output.csv
+das/mask_depth2/data/GT_IMG_1.mat
+das/mask_depth2/data/GT_IMG_1.csv

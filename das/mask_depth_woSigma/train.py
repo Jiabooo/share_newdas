@@ -166,7 +166,7 @@ def train(train_list, model, criterion,mask_criterion,optimizer, epoch,model1):
         img = Variable(img)
         
         output1,mask1 = model1(img) 
-        # output1 = output1/down
+        output1 = output1/down
         mask1 = torch.where(mask1>0.01,1,0)
         output1 = torch.where(output1>0.01,1,0)
         depth = depth.type(torch.FloatTensor).unsqueeze(0).cuda()*output1
@@ -241,7 +241,7 @@ def validate(val_list, model, criterion, mask_criterion,model1):
         
         with torch.no_grad():
             output1,mask1 = model1(img)
-            # output1 = output1/down
+            output1 = output1/down
             mask1 = torch.where(mask1>0.01,1,0)
             output1 = torch.where(output1>0.01,1,0)
             depth = depth.type(torch.FloatTensor).unsqueeze(0).cuda()*output1

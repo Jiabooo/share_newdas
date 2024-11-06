@@ -16,7 +16,7 @@ def calculate_num(gtlist,length,width, gt):
     distancex = length / 5
     distancey = width / 3
     pointgt = [0] * 15
-    disgt = [0]*15
+    disgt = [[] for _ in range(15)]
     i = 0
 
     # pts = np.array(list(zip(np.nonzero(gt)[1], np.nonzero(gt)[0])))
@@ -51,8 +51,8 @@ def calculate_num(gtlist,length,width, gt):
         blockgtcount = int(blockgtcount)
 
         pointgt[blockgtcount] = pointgt[blockgtcount] + 1
-        newdis = disgt[blockgtcount] * (pointgt[blockgtcount]-1) /(pointgt[blockgtcount])
-        disgt[blockgtcount] = newdis + temdis / pointgt[blockgtcount]
+        # newdis = disgt[blockgtcount] * (pointgt[blockgtcount]-1) /(pointgt[blockgtcount])
+        disgt[blockgtcount].append(temdis)
 
     return pointgt, disgt
 
@@ -91,9 +91,21 @@ for i, img_path in enumerate(img_paths):
     # temlist = list(zip(tempointgt,temdisgt))
     # print(zip(tempointgt,temdisgt))
     # print(list(zip(np.array(tempointgt),np.array(temdisgt))))
-    total_point2dis.append(list(zip(np.array(tempointgt),np.array(temdisgt))))
+    # temdisgt = np.array(temdisgt)
+    # print(temdisgt.shape)
+    new_res = []
+    for i in range(len(tempointgt)):
+        # print(temdisgt[i])
+        tem = [(tempointgt[i],j)for j in temdisgt[i]]
+        tem = np.array(tem)
+        # print(tem.shape)
+        total_point2dis.append(tem)
+
+    # print(tempointgt.shape)
+    # print(temdisgt.shape)
+    # total_point2dis.append()
 
 
 # data_frame = pd.DataFrame({'data':total_point2dis[:]})
 data_frame = pd.DataFrame(data=total_point2dis)
-data_frame.to_csv("output.csv", index=False)
+data_frame.to_csv("output_detailed.csv", index=False)

@@ -78,3 +78,5 @@ das/mask_depth2/pk/csrnet/B/result/Density_10.npy
 das/mask_depth2/output.csv
 das/mask_depth2/data/GT_IMG_1.mat
 das/mask_depth2/data/GT_IMG_1.csv
+das/mask_depth2/data/GT_IMG_109.csv
+das/mask_depth2/data/GT_IMG_109.mat

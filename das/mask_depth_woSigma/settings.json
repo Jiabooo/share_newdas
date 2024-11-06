@@ -1,4 +1,4 @@
 {
   "home_dir": "D:/renqun/share_newdas/das",
-  "maskmodel_dir": "D:/renqun/share_newdas/das/mask_depth2/ressultModels/second_Amodel_best.pth.tar"
+  "maskmodel_dir": "D:\\renqun\\share_newdas\\das\\mask_depth_woSigma\\mask_depth.tar"
 }
